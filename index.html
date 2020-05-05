@@ -11,7 +11,15 @@
   id="checkout-button-sku_HDduc3bd6zqiTb"
   role="link"
 >
-  Checkout
+  One-time payment
+</button>
+
+<button
+  style="background-color:#6772E5;color:#FFF;padding:8px 12px;border:0;border-radius:4px;font-size:1em"
+  id="checkout-button-plan_HDgX5GtijL5cLO"
+  role="link"
+>
+  Subscription
 </button>
 
 <div id="error-message"></div>
@@ -26,6 +34,37 @@
     // them to Checkout.
     stripe.redirectToCheckout({
       items: [{sku: 'sku_HDduc3bd6zqiTb', quantity: 1}, {sku: 'sku_HDdoLWUI9iLOt6', quantity: 4}],
+
+      // Do not rely on the redirect to the successUrl for fulfilling
+      // purchases, customers may not always reach the success_url after
+      // a successful payment.
+      // Instead use one of the strategies described in
+      // https://stripe.com/docs/payments/checkout/fulfillment
+      successUrl: 'https://cale-stripe.github.io/success',
+      cancelUrl: 'https://cale-stripe.github.io/canceled',
+    })
+    .then(function (result) {
+      if (result.error) {
+        // If `redirectToCheckout` fails due to a browser or network
+        // error, display the localized error message to your customer.
+        var displayError = document.getElementById('error-message');
+        displayError.textContent = result.error.message;
+      }
+    });
+  });
+})();
+</script>
+
+<script>
+(function() {
+  var stripe = Stripe('pk_test_p0axCEi3o8omdDRHREmnYoCW00ljTW3nYs');
+
+  var checkoutButton = document.getElementById('checkout-button-plan_HDgX5GtijL5cLO');
+  checkoutButton.addEventListener('click', function () {
+    // When the customer clicks on the button, redirect
+    // them to Checkout.
+    stripe.redirectToCheckout({
+      items: [{plan: 'plan_HDgX5GtijL5cLO', quantity: 1}],
 
       // Do not rely on the redirect to the successUrl for fulfilling
       // purchases, customers may not always reach the success_url after
